@@ -1,9 +1,8 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Text to Speech</title>
     <style>
         body {
@@ -21,10 +20,11 @@
             border: 1px solid #ddd;
             border-radius: 10px;
             background-color: white;
+            width: 90%;
+            max-width: 400px;
         }
         textarea {
-            width: 80%;
-            max-width: 400px;
+            width: 100%;
             height: 100px;
             padding: 10px;
             margin: 10px 0;
@@ -44,15 +44,58 @@
         button:hover {
             background-color: #0056b3;
         }
+        #player {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Convert Text to Speech</h1>
-        <form action="/download_audio" method="post">
-            <textarea name="text" placeholder="Enter your text here..."></textarea><br/><br/>
-            <button type="submit">Download Audio</button>
+        <form id="ttsForm">
+            <textarea id="text" placeholder="Enter your text here..."></textarea><br />
+            <button type="submit">Convert & Play</button>
         </form>
+
+        <div id="player" style="display: none;">
+            <audio controls id="audioPlayer" style="width: 100%; margin-top: 10px;"></audio><br />
+            <a id="downloadLink" href="#" download="speech.wav">Download Audio</a>
+        </div>
     </div>
+
+    <script>
+    document.getElementById('ttsForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const text = document.getElementById('text').value.trim();
+        if (!text) {
+            alert('Please enter some text first.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/synthesize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error || 'Synthesis failed');
+            }
+
+            const blob = await response.blob();
+            const url  = URL.createObjectURL(blob);
+
+            // Set up player & download link
+            const audioEl = document.getElementById('audioPlayer');
+            audioEl.src = url;
+            document.getElementById('downloadLink').href = url;
+            document.getElementById('player').style.display = 'block';
+        } catch (err) {
+            alert('Error: ' + err.message);
+        }
+    });
+    </script>
 </body>
 </html>
