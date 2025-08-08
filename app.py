@@ -6,7 +6,7 @@ import azure.cognitiveservices.speech as speechsdk
 app = Flask(__name__)
 
 # Use environment variables for credentials, fallback to hard-coded if not set
-subscription_key = os.getenv("AZURE_SPEECH_KEY", "14RYy8Mq4pzhtSaU3cmsjyowVEDwmCahq9NiqSosE6HUctn9Jor4JQQJ99BDAC5T7U2XJ3w3AAAYACOGpWNi")
+subscription_key = os.getenv("AZURE_SPEECH_KEY", "<KEY>")
 # Don't worry the key is no longer available
 region           = os.getenv("AZURE_SPEECH_REGION", "francecentral")
 
